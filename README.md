@@ -82,3 +82,12 @@ O projeto não foi publicado. `robots.txt` bloqueia indexação durante a demons
 - Correções: ☰ aparecia no desktop; selo do hero cortado pelo arco; cinco fotos de tratamento trocadas para combinar com o nome (Radiofrequência, Laser, Luz pulsada, Depilação a laser, Gordura localizada). Navegadores já usados recebem a correção automaticamente.
 - Tudo continua sem dependências; movimentos respeitam `prefers-reduced-motion`.
 - Observação: `result2-before/after` são cópias do primeiro resultado (fonte única). Fica oculto até existir um segundo par de imagens.
+
+## Versão 2.0 (19/11/2026): redesign editorial
+
+- Nova estrutura focada em clínica estética: abertura com monograma, hero com próxima avaliação livre real, faixa de tratamentos, manifesto, áreas de cuidado expansíveis, tratamentos com filtro animado, jornada em 4 etapas, resultados, especialistas, galeria deslizável, depoimentos, artigos, FAQ e CTA final.
+- Animações com GSAP 3.15 (ScrollTrigger, SplitText, Flip) em `public/vendor/gsap/`, sem CDN, para funcionar também offline. Código em `src/motion.js`. Sem GSAP ou com `prefers-reduced-motion`, o site aparece completo e parado; se o motor falhar, o site continua funcionando.
+- Estilos separados: `src/styles/site.css` (base compartilhada com o painel) e `src/styles/home.css` (site público).
+- Imagens novas em `public/images/tratamentos/` e `public/images/jornada/` com reserva automática para as antigas (`imageFallback` em `seed.js`). Prompt para gerar as fotos: `docs/PROMPT-IMAGENS-GPT.md`.
+- Parâmetros de teste: `?semintro` pula a abertura; `?semraf` simula quadros de animação em abas ocultas.
+- Correção: o padrão do campo de WhatsApp era uma expressão regular inválida nos navegadores atuais.

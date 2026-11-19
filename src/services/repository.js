@@ -1,9 +1,9 @@
-import {seed} from '../data/seed.js';
+import {seed,imageFallback} from '../data/seed.js';
 export const KEY='lumea-demo-v1';
 export const id=()=>globalThis.crypto?.randomUUID?.()||`id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 let fallback;
 const imageFix={t13:[13,17],t17:[17,21],t19:[19,13],t20:[20,19],t21:[21,20]};
-function migrate(d){if(!d.imagesFixed){for(const t of d.treatments){const fix=imageFix[t.id];if(fix&&t.image===`public/images/treatment-${fix[0]}.webp`)t.image=`public/images/treatment-${fix[1]}.webp`;}d.imagesFixed=true;}return d;}
+function migrate(d){if(!d.imagesFixed){for(const t of d.treatments){const fix=imageFix[t.id];if(fix&&t.image===`public/images/treatment-${fix[0]}.webp`)t.image=`public/images/treatment-${fix[1]}.webp`;}d.imagesFixed=true;}if(!d.imagesV2){const fresh=Object.fromEntries(seed().treatments.map(t=>[t.id,t.image]));for(const t of d.treatments){const next=fresh[t.id];if(next&&(t.image===imageFallback[next]||t.image===`public/images/treatment-${t.id.slice(1)}.webp`))t.image=next;}d.imagesV2=true;}return d;}
 export function load(){try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d.version===1&&d.settings&&Array.isArray(d.treatments))return migrate(d);}}catch{}return fallback||migrate(seed());}
 export function save(data){fallback=data;try{localStorage.setItem(KEY,JSON.stringify(data));}catch{throw new Error('Não foi possível salvar neste navegador. Libere espaço ou use uma janela com armazenamento disponível.');}globalThis.window?.dispatchEvent?.(new Event('lumea-change'));return data;}
 export function reset(){return save(migrate(seed()));}
