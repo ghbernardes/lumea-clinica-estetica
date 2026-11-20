@@ -9,13 +9,31 @@ const $=(s,root=document)=>root.querySelector(s),$$=(s,root=document)=>[...root.
 
 function register(){if(registered||!G())return;G().registerPlugin(...[ST(),SPLIT()].filter(Boolean));registered=true;}
 
+/* Varredura: a linha desce pelo rosto; cada ponto da malha acende quando a linha passa e as ligações se desenham. */
+function scanSweep(duration=1.8,light=false){const g=G(),tl=g.timeline(),line=$('.scan-line'),pts=$$('.face-mesh circle'),lines=$$('.face-mesh line');if(!line)return tl;
+  tl.fromTo(line,{top:'0%',autoAlpha:0},{top:'100%',duration,ease:'power1.inOut'},0).to(line,{autoAlpha:1,duration:.2},0).to(line,{autoAlpha:0,duration:.3},duration-.3);
+  if(light){pts.forEach(p=>tl.fromTo(p,{attr:{r:.5}},{attr:{r:1.1},duration:.18,yoyo:true,repeat:1,ease:'power2.out'},Number(p.getAttribute('cy'))/100*duration));return tl}
+  pts.forEach(p=>tl.from(p,{attr:{r:0},autoAlpha:0,duration:.35,ease:'back.out(3)'},Number(p.getAttribute('cy'))/100*duration));
+  lines.forEach(l=>{const len=Math.hypot(l.x2.baseVal.value-l.x1.baseVal.value,l.y2.baseVal.value-l.y1.baseVal.value)*8;l.style.strokeDasharray=len;tl.fromTo(l,{strokeDashoffset:len},{strokeDashoffset:0,duration:.6,ease:'power2.out'},Math.max(Number(l.getAttribute('y1')),Number(l.getAttribute('y2')))/100*duration)});
+  return tl;}
+/* Nova varredura leve a cada 9 s enquanto o hero estiver visível. */
+function rescanLoop(){const g=G();if(!$('.scan-line'))return;const loop=g.timeline({repeat:-1,repeatDelay:7,delay:6,paused:true});loop.add(scanSweep(1.6,true));ST()?.create({trigger:'.hero',start:'top bottom',end:'bottom top',onToggle:self=>self.isActive?loop.play():loop.pause()});}
+/* Traço curto antes dos rótulos das seções, desenhado ao entrar. */
+function eyebrowLines(){const g=G();$$('main section:not(.hero) .eyebrow').forEach(el=>{el.classList.add('lined');g.fromTo(el,{'--line':0},{'--line':1,duration:1,ease:'expo.out',scrollTrigger:{trigger:el,start:'top 92%',once:true}})});}
+/* Inclinação 3D suave nos cartões (só com mouse). */
+function tiltCards(){if(!finePointer())return;const g=G();$$('.reason,.pro-media').forEach(card=>{g.set(card,{transformPerspective:800});const rx=g.quickTo(card,'rotationX',{duration:.6,ease:'power3'}),ry=g.quickTo(card,'rotationY',{duration:.6,ease:'power3'});card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect();ry(((e.clientX-r.left)/r.width-.5)*8);rx(-((e.clientY-r.top)/r.height-.5)*8)});card.addEventListener('pointerleave',()=>{rx(0);ry(0)})});}
+/* Coração voa do botão até "Minha lista". */
+export function flyTo(from,to){if(!from||!to)return;const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),heart=document.createElement('span');heart.className='fly-heart';heart.textContent='♥';heart.style.left=a.left+a.width/2+'px';heart.style.top=a.top+a.height/2+'px';document.body.append(heart);if(!motionOn()){heart.remove();return}register();const dx=b.left+b.width/2-(a.left+a.width/2),dy=b.top+b.height/2-(a.top+a.height/2);G().timeline({onComplete:()=>heart.remove()}).fromTo(heart,{scale:.4,xPercent:-50,yPercent:-50},{scale:1.6,duration:.25,ease:'back.out(3)'}).to(heart,{x:dx,duration:.8,ease:'power1.inOut'},'.15').to(heart,{y:dy,duration:.8,ease:'back.in(1.4)'},'.15').to(heart,{scale:.5,autoAlpha:0,duration:.25},'-=.2');}
+/* Entrada curta de cards trocados (mapa do rosto, botão da lista). */
+export function animateCard(el){if(!el||!motionOn())return;register();G().fromTo(el,{y:14,autoAlpha:0,filter:'blur(6px)'},{y:0,autoAlpha:1,filter:'blur(0px)',duration:.6,ease:'expo.out',clearProps:'filter'});}
+
 export function stopMotion(){ctx?.revert();ctx=null;spy?.disconnect();spy=null;journeyIO?.disconnect();journeyIO=null;}
 
 export function startMotion(refreshOnly=false){try{runMotion(refreshOnly)}catch(err){console.warn('Animações desativadas:',err);ctx?.revert();ctx=null;document.documentElement.classList.remove('motion');$$('.preloader').forEach(p=>p.remove());document.body.classList.remove('menu-lock')}}
 function runMotion(refreshOnly){scrollSpy();journeySteps();if(refreshOnly){if(motionOn()){ctx?.add(()=>comparatorSweep());ST()?.refresh()}return}
   if(!motionOn()){document.documentElement.classList.remove('motion');return}
   register();document.documentElement.classList.add('motion');
-  ctx=G().context(()=>{const intro=introTimeline();faceTilt();heroScroll();headings();easePhotos();careRows();journeyRail();statement();batches();comparatorSweep();galleryReveal();marqueeVelocity();magnetic();cursorPreview();finale();if(intro)intro.play();});
+  ctx=G().context(()=>{const intro=introTimeline();faceTilt();heroScroll();rescanLoop();eyebrowLines();tiltCards();headings();easePhotos();careRows();journeyRail();statement();batches();comparatorSweep();galleryReveal();marqueeVelocity();magnetic();cursorPreview();finale();if(intro)intro.play();});
   requestAnimationFrame(()=>ST()?.refresh());}
 
 /* Abertura (uma vez por sessão) e entrada do hero: o rosto se revela a partir do olhar. */
@@ -29,8 +47,10 @@ function introTimeline(){const g=G(),title=$('[data-hero-title]');if(!title)retu
     .from('.hero-pill',{y:16,autoAlpha:0,duration:.8},'<.3')
     .from(split?split.chars:title,{autoAlpha:0,filter:'blur(14px)',yPercent:30,duration:1.1,ease:'power3.out',stagger:{each:.018}},'<.1')
     .from('.hero-lead,.hero-actions',{y:24,autoAlpha:0,duration:.9,stagger:.1},'-=.7')
-    .from('[data-marker] .box',{scale:0,autoAlpha:0,duration:.9,ease:'back.out(2)',stagger:.25},'-=.9')
-    .from('[data-marker] .tag',{x:-12,autoAlpha:0,clipPath:'inset(0 100% 0 0)',duration:.8,stagger:.25},'<.15')
+    .add(scanSweep(1.8),'-=1')
+    .from('.region .box',{scale:0,autoAlpha:0,duration:.8,ease:'back.out(2.2)',stagger:.12},'-=.6')
+    .from('.region .tag',{x:-10,autoAlpha:0,clipPath:'inset(0 100% 0 0)',duration:.7,stagger:.12},'<.15')
+    .from('.face-card',{y:30,autoAlpha:0,duration:1},'<.3')
     .from('.hero-stats>div',{x:30,autoAlpha:0,duration:.9,stagger:.12},'<')
     .from('.hero-stats strong',{textContent:0,snap:{textContent:1},duration:1.6,ease:'power2.out',stagger:.12},'<')
     .from('[data-slot]',{y:30,autoAlpha:0,duration:1},'-=1')
@@ -38,10 +58,10 @@ function introTimeline(){const g=G(),title=$('[data-hero-title]');if(!title)retu
   return tl;}
 
 /* "Contato visual": o rosto inclina levemente seguindo o cursor; os marcadores flutuam em outra profundidade. */
-function faceTilt(){const hero=$('.hero'),tilt=$('[data-tilt]');if(!hero||!tilt||!finePointer())return;const g=G();g.set(tilt,{transformPerspective:900});const rx=g.quickTo(tilt,'rotationX',{duration:1,ease:'power3'}),ry=g.quickTo(tilt,'rotationY',{duration:1,ease:'power3'}),tx=g.quickTo(tilt,'x',{duration:1.2,ease:'power3'});const marks=$$('[data-marker]').map((m,i)=>[g.quickTo(m,'x',{duration:1.4,ease:'power3'}),g.quickTo(m,'y',{duration:1.4,ease:'power3'}),1+i*.4]);
+function faceTilt(){const hero=$('.hero'),tilt=$('[data-tilt]');if(!hero||!tilt||!finePointer())return;const g=G();g.set(tilt,{transformPerspective:900});const rx=g.quickTo(tilt,'rotationX',{duration:1,ease:'power3'}),ry=g.quickTo(tilt,'rotationY',{duration:1,ease:'power3'}),tx=g.quickTo(tilt,'x',{duration:1.2,ease:'power3'});const marks=[...$$('.region').map((m,i)=>[m,1+(i%3)*.35]),[$('.face-mesh'),.6]].filter(([m])=>m).map(([m,d])=>[g.quickTo(m,'x',{duration:1.4,ease:'power3'}),g.quickTo(m,'y',{duration:1.4,ease:'power3'}),d]);
   hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect(),nx=(e.clientX-r.left)/r.width-.5,ny=(e.clientY-r.top)/r.height-.5;ry(nx*7);rx(-ny*5);tx(nx*14);marks.forEach(([mx,my,d])=>{mx(nx*22*d);my(ny*16*d)})});hero.addEventListener('pointerleave',()=>{rx(0);ry(0);tx(0);marks.forEach(([mx,my])=>{mx(0);my(0)})});}
 
-function heroScroll(){const g=G();const st={trigger:'.hero',start:'top top',end:'bottom top',scrub:true};g.to('[data-face]',{yPercent:10,scale:.94,ease:'none',scrollTrigger:st});g.to('[data-marker]',{autoAlpha:0,ease:'none',scrollTrigger:{trigger:'.hero',start:'15% top',end:'45% top',scrub:true}});g.to('.hero-copy,.hero-stats',{yPercent:-14,autoAlpha:.15,ease:'none',scrollTrigger:{...st,start:'35% top'}});}
+function heroScroll(){const g=G();if(!matchMedia('(min-width: 1025px)').matches)return;const st={trigger:'.hero',start:'top top',end:'bottom top',scrub:true};g.to('[data-face]',{yPercent:10,scale:.94,ease:'none',scrollTrigger:st});g.to('.face-mesh,.region,.face-card',{autoAlpha:0,ease:'none',scrollTrigger:{trigger:'.hero',start:'20% top',end:'50% top',scrub:true}});g.to('.hero-copy,.hero-stats',{yPercent:-14,autoAlpha:.15,ease:'none',scrollTrigger:{...st,start:'35% top'}});}
 
 /* Títulos sobem linha a linha atrás de uma máscara. */
 function headings(){const g=G();$$('[data-split]').forEach(el=>{if(SPLIT()){SPLIT().create(el,{type:'lines',mask:'lines',autoSplit:true,onSplit:self=>g.from(self.lines,{yPercent:110,duration:1.1,ease:'expo.out',stagger:.08,scrollTrigger:{trigger:el,start:'top 88%',once:true}})})}else g.from(el,{y:40,autoAlpha:0,duration:1,scrollTrigger:{trigger:el,start:'top 88%',once:true}})});

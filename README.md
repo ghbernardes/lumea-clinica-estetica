@@ -99,3 +99,21 @@ O projeto não foi publicado. `robots.txt` bloqueia indexação durante a demons
 - Cardápio de cuidados em colunas sobre foto, com troca de fundo ao passar o mouse e busca que esmaece o que não combina.
 - Jornada com imagem fixa e etapas, manifesto com etiquetas flutuantes, seis compromissos numerados, resultados lado a lado, especialistas com pílulas, FAQ com coluna fixa e fechamento em cartão vinho.
 - `scripts/crop-image.ps1` recorta imagens-fonte em JPEG (usa o .NET do Windows, sem dependências).
+
+## Versão 3.1 (20/11/2026): mapa do rosto 2.0 e painel mais útil
+
+Site:
+- **Mapa do rosto 2.0:** linha de varredura revela uma malha de pontos que se liga; cinco áreas clicáveis (Testa e textura, Olhar, Tom e manchas, Hidratação e viço, Contorno e firmeza). Cada área abre um card com lente de aumento sobre a foto, explicação, cuidados indicados (abrem o detalhe) e "Agendar com este foco". As áreas se alternam sozinhas até a pessoa interagir, e uma varredura leve se repete a cada 9 s enquanto o hero está visível.
+- **Minha lista:** coração em cada cuidado e no detalhe; o coração "voa" até o botão "Minha lista", que mostra os itens e agenda com a lista anexada.
+- **Aberto agora / Fechado** ao vivo no cabeçalho e no rodapé, com as mesmas regras da agenda.
+- O agendamento leva o foco do rosto e a lista para o lead e para a observação do agendamento.
+- Animações extras: traço desenhado nos rótulos das seções e inclinação 3D nos cartões de compromisso e nas fotos das especialistas (só com mouse).
+
+Painel:
+- **Busca rápida (Ctrl+K ou botão "Buscar"):** módulos, leads, clientes, agendamentos, tratamentos, profissionais e ações (novo agendamento, novo lead, baixar backup), com navegação por setas.
+- **Ações rápidas na agenda:** Confirmar, Realizado e Faltou direto no cartão (a confirmação checa conflito de horário).
+- **Visão geral:** gráfico dos próximos 7 dias (clicar abre a agenda do dia) e "Vindo do site", com os focos do mapa do rosto e as listas de interesse.
+- **Novidades:** selo "N novos" em Leads para solicitações que chegaram desde a última visita.
+- Cartões de lead (lista e funil) mostram foco e lista.
+
+Imagens: `docs/PROMPT-IMAGENS-GPT.md` agora é um prompt único com as 42 imagens, incluindo `hero-face-v2.jpg` com enquadramento medido para o mapa do rosto.
