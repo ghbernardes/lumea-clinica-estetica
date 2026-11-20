@@ -73,7 +73,7 @@ function easePhotos(){const g=G();$$('[data-depth]').forEach(el=>{const d=Number
 function careRows(){const g=G();$$('.care-col').forEach(col=>{g.fromTo($$('h3,li',col),{y:24,autoAlpha:0},{y:0,autoAlpha:1,duration:.8,ease:'power3.out',stagger:.04,scrollTrigger:{trigger:col,start:'top 85%',once:true}})});g.fromTo('.care-bg',{scale:1.15},{scale:1,ease:'none',scrollTrigger:{trigger:'.care',start:'top bottom',end:'bottom top',scrub:true}});}
 
 /* Jornada: imagem fixa à esquerda troca conforme a etapa visível (funciona mesmo sem GSAP). */
-const dots=[[44,34],[58,30],[52,62],[40,42]];
+const dots=[[70,18],[68,22],[72,16],[66,20]];
 function journeySteps(){journeyIO?.disconnect();const steps=$$('.journey-step');if(!steps.length)return;const shots=$$('.journey-shot'),dot=$('.journey-dot'),counter=$('.journey-counter b');journeyIO=new IntersectionObserver(entries=>entries.forEach(e=>{if(!e.isIntersecting)return;const i=Number(e.target.dataset.step);steps.forEach(s=>s.classList.toggle('is-on',s===e.target));shots.forEach((s,k)=>s.classList.toggle('is-on',k===i));if(dot){const [x,y]=dots[i]||dots[0];dot.style.setProperty('--x',x+'%');dot.style.setProperty('--y',y+'%');$('b',dot).textContent=$('h3',e.target).textContent;dot.classList.remove('pop');void dot.offsetWidth;dot.classList.add('pop')}if(counter)counter.textContent=String(i+1).padStart(2,'0')}),{rootMargin:'-45% 0px -45% 0px'});steps.forEach(s=>journeyIO.observe(s));}
 function journeyRail(){G().fromTo('.journey-rail span',{scaleY:0},{scaleY:1,ease:'none',scrollTrigger:{trigger:'.journey-steps',start:'top 55%',end:'bottom 60%',scrub:true}});}
 

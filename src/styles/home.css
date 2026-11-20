@@ -235,7 +235,7 @@ details[open] .faq-icon{background:var(--ink);border-color:var(--ink);transform:
 .region:focus-visible{outline:none}.region:focus-visible .tag{outline:2px solid var(--gold);outline-offset:3px}
 .face-card{position:absolute;z-index:4;left:-6%;bottom:9%;width:min(330px,80%)}
 .face-card-body{display:grid;grid-template-columns:76px 1fr;gap:16px;padding:16px;border-radius:20px;background:#f4efe8eb;backdrop-filter:blur(16px);box-shadow:0 24px 60px #1d171926}
-.lens{position:relative;width:76px;height:76px;border-radius:50%;background-image:url('../../public/images/hero-face.jpg');background-size:320%;box-shadow:inset 0 0 0 3px #fff,0 6px 18px #1d171926;overflow:hidden}
+.lens{position:relative;width:76px;height:76px;border-radius:50%;background-image:url('../../public/images/hero-face-v2.jpg');background-size:320%;box-shadow:inset 0 0 0 3px #fff,0 6px 18px #1d171926;overflow:hidden}
 .lens i{position:absolute;inset:0;background:linear-gradient(transparent 46%,#ffffffb3 50%,transparent 54%);animation:lensScan 2.4s ease-in-out infinite}
 .fc-text small{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.fc-text h3{font-size:1.5rem;margin:4px 0 6px}.fc-text p{font-size:.78rem;line-height:1.5;margin-bottom:10px}
 .fc-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}.fc-chip{padding:5px 10px;border-radius:999px;border:1px solid var(--line);font-size:.68rem;background:var(--paper);transition:background .3s,color .3s,border-color .3s}.fc-chip:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
@@ -271,3 +271,6 @@ details[open] .faq-icon{background:var(--ink);border-color:var(--ink);transform:
 .face-card{position:relative;left:auto;bottom:auto;width:100%;margin-top:-30px}.face-note{position:static;transform:none;text-align:center;margin-top:10px;white-space:normal}
 .list-fab{left:16px;bottom:16px}}
 @media(min-width:1025px){.face-card{left:-22%;bottom:2%;width:300px}.face-card-body{grid-template-columns:60px 1fr;gap:12px;padding:14px}.lens{width:60px;height:60px}.fc-text h3{font-size:1.3rem}.fc-text p{font-size:.74rem;margin-bottom:8px}.fc-chips{margin-bottom:10px}}
+/* Rótulo da jornada em pílula: legível sobre fotos claras */
+.journey-dot b{padding:6px 12px;border-radius:999px;background:#f4efe8e0;backdrop-filter:blur(10px);color:var(--ink);text-shadow:none;letter-spacing:.12em}
+.journey-counter{padding:6px 14px;border-radius:999px;background:#1d171966;backdrop-filter:blur(8px)}

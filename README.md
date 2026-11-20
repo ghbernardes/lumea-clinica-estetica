@@ -117,3 +117,10 @@ Painel:
 - Cartões de lead (lista e funil) mostram foco e lista.
 
 Imagens: `docs/PROMPT-IMAGENS-GPT.md` agora é um prompt único com as 42 imagens, incluindo `hero-face-v2.jpg` com enquadramento medido para o mapa do rosto.
+
+## Versão 3.2 (20/11/2026): fotografias definitivas
+
+- 41 fotografias definitivas (com versão leve) + imagem de compartilhamento, geradas pelo GPT a partir de `docs/PROMPT-IMAGENS-GPT.md` (PR #1).
+- Mapa do rosto trocado para `hero-face-v2.jpg` (1800 px) com áreas e malha recalibradas para a nova foto; a lente usa a mesma imagem.
+- `og-image.jpg` como imagem de compartilhamento; segundo resultado ilustrativo publicado por padrão para novas visitas.
+- Rótulo da jornada em pílula, legível sobre fotos claras.
