@@ -20,7 +20,7 @@ Você vai gerar e enviar as fotografias do site demonstrativo **LUMÉA — Clín
 ## Direção de arte (vale para todas)
 
 - Fotografia editorial realista de uma clínica de estética premium e acolhedora, no Brasil. Nada de aparência de banco de imagens genérico, render 3D ou ilustração.
-- Paleta: vinho `#541C32`, nude `#D6A7A5`, champanhe `#C8A46A`, marfim `#F7F2EA`, madeira clara, pedra/travertino, linho. Luz natural quente e suave, sombras de janela, profundidade de campo rasa.
+- Paleta: linho `#EFE8DF`, areia `#D8CFC4`, pedra `#B3A596`, blush `#E7D1CB` e vinho `#5A1A2F` só como acento; madeira clara, travertino, linho. Fundos neutros e quentes, nunca branco puro. Luz natural quente e suave, sombras de janela, profundidade de campo rasa.
 - Ambiente consistente em todas as fotos: paredes marfim com nicho em arco, bancadas de travertino, madeira clara, plantas pendentes (jiboia), galhos secos vinho em vaso de vidro, toalhas brancas e mantas vinho.
 - Profissionais com uniforme **vinho** (gola padre) ou **marfim**. Mãos com luvas nitrílicas brancas ou nude quando houver contato com a pele.
 - Pessoas brasileiras diversas (tons de pele, idades de 25 a 60, tipos de cabelo), expressões serenas e naturais, pele real com textura, **sem retoque exagerado**.

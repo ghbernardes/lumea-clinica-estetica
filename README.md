@@ -91,3 +91,11 @@ O projeto não foi publicado. `robots.txt` bloqueia indexação durante a demons
 - Imagens novas em `public/images/tratamentos/` e `public/images/jornada/` com reserva automática para as antigas (`imageFallback` em `seed.js`). Prompt para gerar as fotos: `docs/PROMPT-IMAGENS-GPT.md`.
 - Parâmetros de teste: `?semintro` pula a abertura; `?semraf` simula quadros de animação em abas ocultas.
 - Correção: o padrão do campo de WhatsApp era uma expressão regular inválida nos navegadores atuais.
+
+## Versão 3.0 (20/11/2026): identidade própria
+
+- Nova direção visual, documentada em `docs/DESIGN.md`: linho e areia, Cormorant Garamond com itálico + Manrope, cantos de 24 px, pílulas.
+- Hero com rosto em "contato visual", marcadores de leitura de pele, números e próxima avaliação livre.
+- Cardápio de cuidados em colunas sobre foto, com troca de fundo ao passar o mouse e busca que esmaece o que não combina.
+- Jornada com imagem fixa e etapas, manifesto com etiquetas flutuantes, seis compromissos numerados, resultados lado a lado, especialistas com pílulas, FAQ com coluna fixa e fechamento em cartão vinho.
+- `scripts/crop-image.ps1` recorta imagens-fonte em JPEG (usa o .NET do Windows, sem dependências).
