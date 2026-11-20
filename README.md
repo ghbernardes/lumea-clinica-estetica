@@ -124,3 +124,21 @@ Imagens: `docs/PROMPT-IMAGENS-GPT.md` agora é um prompt único com as 42 imagen
 - Mapa do rosto trocado para `hero-face-v2.jpg` (1800 px) com áreas e malha recalibradas para a nova foto; a lente usa a mesma imagem.
 - `og-image.jpg` como imagem de compartilhamento; segundo resultado ilustrativo publicado por padrão para novas visitas.
 - Rótulo da jornada em pílula, legível sobre fotos claras.
+
+## Versão 3.3 (20/11/2026): textos, quiz e movimento avançado
+
+- **Textos reescritos** com voz própria (hero, "A LUMÉA", cardápio, jornada, resultados, especialistas, espaço, artigos, dúvidas). Saiu a frase quase traduzida da referência. Títulos editáveis no painel aceitam `*asteriscos*` para o trecho em itálico; quem já usou a demo recebe os textos novos só onde ainda estava o texto antigo.
+- **Quiz "Por onde começar?"** (hero e cardápio): três perguntas e até três cuidados sugeridos, com o motivo de cada um, respeitando a experiência e o tempo de recuperação aceito. Dá para agendar com o resultado (vai como foco "Quiz: …") ou salvar tudo na lista.
+- **Movimento:**
+  - a faixa de chamadas segue a direção e a velocidade da rolagem;
+  - luz suave no hero acompanha o mouse;
+  - cursor complementar com rótulo ("Ver", "Arraste", "Conhecer");
+  - o cardápio sobe por cima de "A LUMÉA", que encolhe e escurece (só no computador).
+- **Acabamento:** grão editorial sutil e título do hero devolvido a texto puro depois da entrada, para ficar mais nítido.
+
+## Versão 3.4 (20/11/2026): painel mais bonito e etiquetas vivas
+
+- Correção: a seção "A LUMÉA" ficava presa por cima das seções seguintes; agora fica presa só enquanto o cardápio sobe (pin com início e fim).
+- **Painel:** ícones de traço do Lucide (`src/icons.js`, licença ISC, só os 32 usados) no menu, na busca e nos cartões; menu agrupado (Dia a dia, Cuidados e conteúdo, Gestão) em pílulas, com item ativo em vinho.
+- **Gráficos:** os cartões da visão geral mostram dados reais dos últimos 7 dias (área + linha desenhada) e a tendência; as barras ganharam posição e percentual; as etapas comerciais viraram rosca com legenda.
+- **Manifesto:** 12 etiquetas com palavras e mensagens, em três profundidades, flutuando sem parar atrás do texto, subindo com a rolagem e fugindo um pouco do mouse.

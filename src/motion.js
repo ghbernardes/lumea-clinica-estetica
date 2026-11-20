@@ -27,13 +27,29 @@ export function flyTo(from,to){if(!from||!to)return;const a=from.getBoundingClie
 /* Entrada curta de cards trocados (mapa do rosto, botão da lista). */
 export function animateCard(el){if(!el||!motionOn())return;register();G().fromTo(el,{y:14,autoAlpha:0,filter:'blur(6px)'},{y:0,autoAlpha:1,filter:'blur(0px)',duration:.6,ease:'expo.out',clearProps:'filter'});}
 
+/* Luz suave que acompanha o mouse no hero. */
+function heroLight(){const hero=$('.hero');if(!hero||!finePointer())return;const g=G(),p={x:60,y:40};const apply=()=>{hero.style.setProperty('--mx',p.x+'%');hero.style.setProperty('--my',p.y+'%')};hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();g.to(p,{x:(e.clientX-r.left)/r.width*100,y:(e.clientY-r.top)/r.height*100,duration:1.2,ease:'power3',onUpdate:apply,overwrite:true})});}
+/* Cursor complementar: anel que cresce e mostra um rótulo sobre fotos e itens clicáveis (o cursor normal continua visível). */
+const cursorTargets=[['.care-row','Ver'],['.gallery-strip','Arraste'],['.comparison','Arraste'],['.pro-media','Conhecer'],['.journey-frame','Jornada'],['.region','Ler'],['.ease-photo','LUMÉA'],['.final-media','']];
+let ringEl=null,ringBound=false,marqueeTick=null;
+function cursorRing(){if(!finePointer())return;const g=G();if(!ringEl){ringEl=document.createElement('div');ringEl.className='cursor-ring';ringEl.setAttribute('aria-hidden','true');ringEl.innerHTML='<span></span>';document.body.append(ringEl);g.set(ringEl,{xPercent:-50,yPercent:-50,autoAlpha:0})}
+  const x=g.quickTo(ringEl,'x',{duration:.45,ease:'power3'}),y=g.quickTo(ringEl,'y',{duration:.45,ease:'power3'}),label=$('span',ringEl);
+  const move=e=>{x(e.clientX);y(e.clientY);g.to(ringEl,{autoAlpha:1,duration:.3,overwrite:'auto'});const hit=cursorTargets.find(([sel])=>e.target.closest?.(sel));const text=hit?hit[1]:'';if(hit&&text){if(!ringEl.classList.contains('big')){ringEl.classList.add('big');label.textContent=text}else label.textContent=text}else ringEl.classList.remove('big');ringEl.classList.toggle('on-link',!hit&&!!e.target.closest?.('a,button,input,select,label,summary'));};
+  if(ringBound)return;ringBound=true;addEventListener('pointermove',move,{passive:true});document.addEventListener('pointerleave',()=>g.to(ringEl,{autoAlpha:0,duration:.3}));}
+/* Seções empilhadas: o cardápio sobe por cima de "A LUMÉA", que fica presa, encolhe e escurece (só no computador). */
+function stackSections(){const g=G(),mm=g.matchMedia();mm.add('(min-width: 1025px)',()=>{const ease=$('.ease'),care=$('.care');if(!ease||!care)return;care.classList.add('stacking');
+  /* Pin com início e fim definidos: "A LUMÉA" só fica presa enquanto o cardápio sobe; depois volta ao fluxo normal. */
+  const pin=ST().create({trigger:ease,start:()=>ease.offsetHeight>innerHeight?'bottom bottom':'top top',endTrigger:care,end:'top top',pin:true,pinSpacing:false,invalidateOnRefresh:true});
+  const tween=g.to(ease,{scale:.92,filter:'brightness(.72)',borderRadius:'40px',ease:'none',scrollTrigger:{trigger:care,start:'top bottom',end:'top top',scrub:true}});
+  return ()=>{care.classList.remove('stacking');pin.kill();tween.scrollTrigger?.kill();g.set(ease,{clearProps:'all'})};});}
+
 export function stopMotion(){ctx?.revert();ctx=null;spy?.disconnect();spy=null;journeyIO?.disconnect();journeyIO=null;}
 
 export function startMotion(refreshOnly=false){try{runMotion(refreshOnly)}catch(err){console.warn('Animações desativadas:',err);ctx?.revert();ctx=null;document.documentElement.classList.remove('motion');$$('.preloader').forEach(p=>p.remove());document.body.classList.remove('menu-lock')}}
 function runMotion(refreshOnly){scrollSpy();journeySteps();if(refreshOnly){if(motionOn()){ctx?.add(()=>comparatorSweep());ST()?.refresh()}return}
   if(!motionOn()){document.documentElement.classList.remove('motion');return}
   register();document.documentElement.classList.add('motion');
-  ctx=G().context(()=>{const intro=introTimeline();faceTilt();heroScroll();rescanLoop();eyebrowLines();tiltCards();headings();easePhotos();careRows();journeyRail();statement();batches();comparatorSweep();galleryReveal();marqueeVelocity();magnetic();cursorPreview();finale();if(intro)intro.play();});
+  ctx=G().context(()=>{const intro=introTimeline();faceTilt();heroScroll();rescanLoop();eyebrowLines();tiltCards();heroLight();cursorRing();stackSections();headings();easePhotos();careRows();journeyRail();statement();batches();comparatorSweep();galleryReveal();marqueeVelocity();magnetic();cursorPreview();finale();if(intro)intro.play();});
   requestAnimationFrame(()=>ST()?.refresh());}
 
 /* Abertura (uma vez por sessão) e entrada do hero: o rosto se revela a partir do olhar. */
@@ -45,7 +61,7 @@ function introTimeline(){const g=G(),title=$('[data-hero-title]');if(!title)retu
   tl.fromTo('[data-face] picture',{clipPath:'circle(0% at 50% 38%)'},{clipPath:'circle(75% at 50% 38%)',duration:1.8,ease:'expo.inOut',clearProps:'clipPath'},start)
     .from('[data-face] img',{scale:1.25,duration:2.4,ease:'expo.out'},'<.1')
     .from('.hero-pill',{y:16,autoAlpha:0,duration:.8},'<.3')
-    .from(split?split.chars:title,{autoAlpha:0,filter:'blur(14px)',yPercent:30,duration:1.1,ease:'power3.out',stagger:{each:.018}},'<.1')
+    .from(split?split.chars:title,{autoAlpha:0,filter:'blur(14px)',yPercent:30,duration:1.1,ease:'power3.out',stagger:{each:.018},onComplete:()=>split?.revert()},'<.1')
     .from('.hero-lead,.hero-actions',{y:24,autoAlpha:0,duration:.9,stagger:.1},'-=.7')
     .add(scanSweep(1.8),'-=1')
     .from('.region .box',{scale:0,autoAlpha:0,duration:.8,ease:'back.out(2.2)',stagger:.12},'-=.6')
@@ -79,7 +95,12 @@ function journeyRail(){G().fromTo('.journey-rail span',{scaleY:0},{scaleY:1,ease
 
 /* Frase grande acende palavra por palavra; etiquetas flutuam em profundidades diferentes. */
 function statement(){const g=G(),el=$('[data-words]');if(!el)return;if(SPLIT()){const split=SPLIT().create(el,{type:'words'});g.fromTo(split.words,{opacity:.14},{opacity:1,stagger:.08,ease:'none',scrollTrigger:{trigger:el,start:'top 78%',end:'bottom 45%',scrub:true}})}
-  $$('[data-chip]').forEach((c,i)=>{g.from(c,{scale:0,autoAlpha:0,duration:1,ease:'back.out(2)',delay:i*.08,scrollTrigger:{trigger:'.statement',start:'top 70%',once:true}});g.to(c,{yPercent:(i%2?-1:1)*(60+i*25),ease:'none',scrollTrigger:{trigger:'.statement',start:'top bottom',end:'bottom top',scrub:true}});g.to(c,{rotate:i%2?4:-4,duration:3+i*.4,ease:'sine.inOut',yoyo:true,repeat:-1})});}
+  /* Cada etiqueta: entra com mola, deriva sem parar em trajetória própria, sobe com a rolagem conforme a profundidade e foge um pouco do mouse. */
+  const chipsEls=$$('[data-chip]'),field=$('.chip-field'),R=g.utils.random;
+  chipsEls.forEach((c,i)=>{const d=Number(c.dataset.depth)||1,inner=c;g.fromTo(c,{scale:0,autoAlpha:0},{scale:1,autoAlpha:[1,.85,.6][d-1]||1,duration:1.1,ease:'back.out(1.8)',delay:i*.07,scrollTrigger:{trigger:'.statement',start:'top 75%',once:true}});
+    const drift=()=>inner.isConnected&&g.to(inner,{x:R(-46,46)/d,y:R(-34,34)/d,rotation:R(-7,7),duration:R(4.5,8),ease:'sine.inOut',onComplete:drift});drift();
+    g.fromTo(c,{yPercent:70/d*(i%2?1:-1)},{yPercent:-110/d*(i%2?1:-1),ease:'none',scrollTrigger:{trigger:'.statement',start:'top bottom',end:'bottom top',scrub:true}})});
+  if(field&&finePointer()){const movers=chipsEls.map(c=>{const d=Number(c.dataset.depth)||1;return [g.quickTo(c,'xPercent',{duration:1.2,ease:'power3'}),c,d]});const sec=$('.statement');sec.addEventListener('pointermove',e=>{movers.forEach(([qx,c,d])=>{const r=c.getBoundingClientRect(),dx=r.left+r.width/2-e.clientX,dy=r.top+r.height/2-e.clientY,dist=Math.hypot(dx,dy);qx(dist<220?Math.sign(dx)*(220-dist)/(5*d):0)})});sec.addEventListener('pointerleave',()=>movers.forEach(([qx])=>qx(0)))}}
 
 function batches(){const g=G(),st=ST();if(!st)return;for(const [sel,from] of [['.reason',{y:60}],['.pro-card',{y:80}],['.article-list li',{x:-40}],['#faq-list details',{y:24}]]){const els=$$(sel);if(!els.length)continue;g.set(els,{autoAlpha:0,...from});st.batch(els,{start:'top 92%',once:true,onEnter:b=>g.to(b,{autoAlpha:1,x:0,y:0,duration:1,ease:'expo.out',stagger:.08,overwrite:true})})}
   $$('.pro-media').forEach(m=>g.from(m,{clipPath:'inset(100% 0 0 0 round 28px)',duration:1.4,ease:'expo.inOut',scrollTrigger:{trigger:m,start:'top 88%',once:true}}));}
@@ -90,13 +111,19 @@ function comparatorSweep(){const g=G(),box=$('.comparison');if(!box)return;const
 
 function galleryReveal(){const g=G();g.from('.gallery-item',{xPercent:30,autoAlpha:0,duration:1.2,ease:'expo.out',stagger:.1,scrollTrigger:{trigger:'#gallery-strip',start:'top 85%',once:true}});const strip=$('#gallery-strip');if(!strip)return;const imgs=$$('.gallery-frame img',strip);const onScroll=()=>{const mid=strip.getBoundingClientRect().left+strip.clientWidth/2;imgs.forEach(img=>{const r=img.parentElement.getBoundingClientRect();img.style.transform=`translateX(${(r.left+r.width/2-mid)/strip.clientWidth*-8}%) scale(1.15)`})};strip.addEventListener('scroll',onScroll,{passive:true});onScroll();}
 
-function marqueeVelocity(){const g=G(),track=$('.marquee-track');if(!track||!ST())return;const skew=g.quickTo(track,'skewX',{duration:.5,ease:'power3'});ST().create({trigger:'.marquee',start:'top bottom',end:'bottom top',onUpdate:self=>skew(g.utils.clamp(-8,8,self.getVelocity()/-260))});}
+function marqueeVelocity(){const g=G(),track=$('.marquee-track');if(!track||!ST())return;let x=0,dir=-1,boost=0;const set=g.quickSetter(track,'xPercent');const skew=g.quickTo(track,'skewX',{duration:.5,ease:'power3'});if(marqueeTick)g.ticker.remove(marqueeTick);const tick=marqueeTick=(t,dt)=>{boost*=.92;x+=(0.012+boost)*dir*dt/16;if(x<=-50)x+=50;if(x>0)x-=50;set(x)};g.ticker.add(tick);ST().create({trigger:'.marquee',start:'top bottom',end:'bottom top',onUpdate:self=>{dir=self.direction===1?-1:1;boost=Math.min(.6,Math.abs(self.getVelocity())/9000);skew(g.utils.clamp(-6,6,self.getVelocity()/-300))}});return ()=>g.ticker.remove(tick);}
+function marqueeVelocityOld(){const g=G(),track=$('.marquee-track');if(!track||!ST())return;const skew=g.quickTo(track,'skewX',{duration:.5,ease:'power3'});ST().create({trigger:'.marquee',start:'top bottom',end:'bottom top',onUpdate:self=>skew(g.utils.clamp(-8,8,self.getVelocity()/-260))});}
 
 function magnetic(){if(!finePointer())return;const g=G();$$('.magnetic').forEach(btn=>{const x=g.quickTo(btn,'x',{duration:.6,ease:'elastic.out(1,.4)'}),y=g.quickTo(btn,'y',{duration:.6,ease:'elastic.out(1,.4)'});btn.addEventListener('pointermove',e=>{const r=btn.getBoundingClientRect();x((e.clientX-r.left-r.width/2)*.28);y((e.clientY-r.top-r.height/2)*.38)});btn.addEventListener('pointerleave',()=>{x(0);y(0)})});}
 
 /* Artigos: a imagem do texto acompanha o cursor na lista. */
 function cursorPreview(){const box=$('.cursor-preview'),list=$('.article-list');if(!box||!list||!finePointer())return;const g=G(),img=$('img',box);const x=g.quickTo(box,'x',{duration:.55,ease:'power3'}),y=g.quickTo(box,'y',{duration:.55,ease:'power3'});g.set(box,{xPercent:-50,yPercent:-50,scale:0,autoAlpha:0});
-  list.addEventListener('pointermove',e=>{x(e.clientX);y(e.clientY)});$$('.article-row',list).forEach(row=>row.addEventListener('pointerenter',()=>{img.src=row.dataset.preview;g.to(box,{scale:1,autoAlpha:1,rotate:g.utils.random(-6,6),duration:.5,ease:'expo.out'})}));list.addEventListener('pointerleave',()=>g.to(box,{scale:0,autoAlpha:0,duration:.4,ease:'power3.in'}));}
+  /* A prévia só existe com o cursor sobre um artigo: some ao sair da lista e também ao rolar a página
+     (rolar com a roda tira a lista de baixo do cursor sem disparar "pointerleave"). */
+  let shown=false,current=null;const hide=()=>{if(!shown)return;shown=false;current=null;g.to(box,{scale:0,autoAlpha:0,duration:.3,ease:'power3.in',overwrite:true})};
+  let px=0,py=0;const show=row=>{if(current===row)return;if(!shown)g.set(box,{x:px,y:py});current=row;img.src=row.dataset.preview;shown=true;g.to(box,{scale:1,autoAlpha:1,rotate:g.utils.random(-6,6),duration:.5,ease:'expo.out',overwrite:true})};
+  list.addEventListener('pointermove',e=>{px=e.clientX;py=e.clientY;x(px);y(py);const row=e.target.closest('.article-row');row?show(row):hide()});list.addEventListener('pointerleave',hide);
+  ST()?.create({trigger:list,start:'top bottom',end:'bottom top',onUpdate:hide,onLeave:hide,onLeaveBack:hide});}
 
 function finale(){const g=G();g.fromTo('.final-media img',{scale:1.25},{scale:1,ease:'none',scrollTrigger:{trigger:'.final',start:'top bottom',end:'bottom bottom',scrub:true}});g.from('.final-actions',{y:30,autoAlpha:0,duration:1,ease:'expo.out',scrollTrigger:{trigger:'.final-actions',start:'top 92%',once:true}});g.fromTo('.footer-word',{yPercent:60},{yPercent:0,ease:'none',scrollTrigger:{trigger:'.footer',start:'top bottom',end:'bottom bottom',scrub:true}});g.from('.quote-mark',{scale:.4,rotate:-25,autoAlpha:0,duration:1.2,ease:'expo.out',scrollTrigger:{trigger:'.testimonials',start:'top 80%',once:true}});}
 
